@@ -41,20 +41,13 @@ executeStep (state, (ls, s, rs), steps, writeCount) =
 initTape :: Tape
 initTape = ([], Zero, repeat Zero)
 
-runMachine :: (State, Tape, Steps, WriteCount) -> IO ()
-runMachine (Halt, tape, steps, writeCount) = do
-  putStrLn $ "Step: " ++ show steps
-  putStrLn "Machine halted."
-runMachine stateTapeStepsWriteCount@(state, tape, steps, writeCount) = do
+runMachine :: (State, Tape, Steps, WriteCount) -> Steps
+runMachine (Halt, _, steps, _) =
+  steps
+runMachine stateTapeStepsWriteCount =
   runMachine $ executeStep stateTapeStepsWriteCount
-
-printTape :: Tape -> IO ()
-printTape (ls, s, rs) = putStrLn $ concatMap showSymbol (reverse ls) ++ showSymbol s ++ take 10000 (concatMap showSymbol rs)
-  where
-    showSymbol Zero = "0"
-    showSymbol One = "1"
 
 main :: IO ()
 main = do
   let initialMachine = (A, initTape, 0, 0)
-  runMachine initialMachine
+  let count = runMachine initialMachine in print count
